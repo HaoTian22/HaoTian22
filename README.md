@@ -1,4 +1,9 @@
 ### Hi there 👋, I'm Hao_Tian.
+- 🚀 I’m currently working on developing my skills in the field of digital technology.
+- 📱 I have a strong interest in digital technology and its applications.
+- 🏸 In my free time, I enjoy playing badminton and staying active.
+- 🚊 I am also interested in public transportation and its role in sustainable urban development.
+
 
 ![Hao_Tian's GitHub stats](https://github-readme-stats.vercel.app/api?username=haotian22&show_icons=true)
 
