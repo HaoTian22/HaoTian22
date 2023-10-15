@@ -1,7 +1,7 @@
 ### Hi there 👋, I'm Hao_Tian.
 - 🚀 I’m currently working on developing my skills in the field of digital technology.
 - 📱 I have a strong interest in digital technology and its applications.
-- 🏸 In my free time, I enjoy playing badminton and staying active.
+- 🏸 In my free time, I enjoy playing badminton and climbing mountains.
 - 🚊 I am also interested in public transportation and its role in sustainable urban development.
 
 
