@@ -10,10 +10,13 @@
 
 #### Contact me
 
-# [![Telegram](https://img.shields.io/badge/-Telegram-007acc?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.me/HaoTian22)
 Email me in English or Chinese
 
 <!--
+ [![Telegram](https://img.shields.io/badge/-Telegram-007acc?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.me/HaoTian22)
+
+
+
 **HaoTian22/HaoTian22** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
 Here are some ideas to get you started:
