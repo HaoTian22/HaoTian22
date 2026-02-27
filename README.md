@@ -5,8 +5,7 @@
 - 🏸 In my free time, I enjoy playing badminton and climbing mountains.
 - 🚊 I am also interested in public transportation and its role in sustainable urban development.
 
-
-![Hao_Tian's GitHub stats](https://github-readme-stats.vercel.app/api?username=haotian22&show_icons=true)
+[![GitHub stats](https://github-stats-extended.vercel.app/api?username=haotian22)](https://github.com/stats-organization/github-stats-extended)
 
 #### Contact me
 
