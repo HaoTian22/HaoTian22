@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Image Viewer - OpenSeadragon</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #141414;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+  }
+
+  #viewer {
+    width: 100%;
+    height: 100%;
+    background: #141414;
+  }
+
+  /* ---------- Top hover zone (reveals toolbar) ---------- */
+  #hoverZone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    z-index: 999;
+  }
+
+  /* ---------- Top toolbar ---------- */
+  #toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background: rgba(24, 24, 24, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.28s cubic-bezier(.4,0,.2,1);
+  }
+  #toolbar.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #urlInput {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 17px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #f0f0f0;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #urlInput::placeholder { color: #8a8a8a; }
+  #urlInput:focus {
+    border-color: #5b9dff;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .btn {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 17px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #eee;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.14); }
+  .btn:active { transform: scale(0.96); }
+  .btn.primary {
+    background: #4d7cff;
+    border-color: #4d7cff;
+    color: #fff;
+  }
+  .btn.primary:hover { background: #6690ff; }
+
+  /* ---------- Collapsed toolbar handle ---------- */
+  #toolbarHandle {
+    position: fixed;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.18);
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  #toolbarHandle.show { opacity: 0.8; }
+
+  /* ---------- Floating zoom controls (bottom-right) ---------- */
+  #controls {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(24, 24, 24, 0.65);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 6px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  #controls.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .ctrl-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.12s;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.14); }
+  .ctrl-btn:active { transform: scale(0.9); }
+  .ctrl-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .ctrl-divider {
+    width: 24px;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 2px 0;
+  }
+
+  /* ---------- Empty state ---------- */
+  #emptyState {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    gap: 12px;
+    padding: 0 20px;
+    z-index: 5;
+  }
+  #emptyState .hint {
+    max-width: 480px;
+    line-height: 1.6;
+    color: #666;
+    font-size: 12px;
+  }
+  #emptyState code {
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #9cdcfe;
+  }
+
+  #errorBanner {
+    position: fixed;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(90, 29, 29, 0.92);
+    color: #ffd7d7;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    z-index: 1001;
+    display: none;
+    max-width: 80%;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+
+  #loading {
+    position: fixed;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(29, 58, 90, 0.92);
+    color: #d7e9ff;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    z-index: 1001;
+    display: none;
+    backdrop-filter: blur(8px);
+  }
+</style>
+</head>
+<body>
+
+<div id="hoverZone"></div>
+<div id="toolbarHandle"></div>
+
+<div id="toolbar">
+  <input id="urlInput" type="text" placeholder="Paste an image URL (jpg / png / webp...) and press Enter" />
+  <button class="btn primary" id="openBtn">Open</button>
+</div>
+
+<div id="loading">Loading...</div>
+<div id="errorBanner"></div>
+
+<div id="viewer"></div>
+
+<div id="emptyState">
+  <div>No image loaded yet</div>
+  <div class="hint">
+    Paste an image URL above and press Enter, or open directly via a query parameter, e.g.:<br>
+    <code>image_viewer.html?url=https://example.com/photo.jpg</code>
+  </div>
+</div>
+
+<!-- Floating zoom controls (bottom-right) -->
+<div id="controls">
+  <button class="ctrl-btn" id="zoomInBtn" title="Zoom in">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+  </button>
+  <button class="ctrl-btn" id="zoomOutBtn" title="Zoom out">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+  </button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" id="fitCtrlBtn" title="Fit to window">
+    <svg viewBox="0 0 24 24"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/openseadragon.min.js"></script>
+<script>
+(function () {
+  var PREFIX_URL = "https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/images/";
+
+  var emptyState = document.getElementById('emptyState');
+  var errorBanner = document.getElementById('errorBanner');
+  var loadingEl = document.getElementById('loading');
+  var urlInput = document.getElementById('urlInput');
+  var openBtn = document.getElementById('openBtn');
+  var toolbar = document.getElementById('toolbar');
+  var hoverZone = document.getElementById('hoverZone');
+  var toolbarHandle = document.getElementById('toolbarHandle');
+  var controls = document.getElementById('controls');
+
+  var zoomInBtn = document.getElementById('zoomInBtn');
+  var zoomOutBtn = document.getElementById('zoomOutBtn');
+  var fitCtrlBtn = document.getElementById('fitCtrlBtn');
+
+  var imageLoaded = false;
+  var toolbarHideTimer = null;
+
+  var viewer = OpenSeadragon({
+    id: "viewer",
+    prefixUrl: PREFIX_URL,
+    showNavigationControl: false,
+
+    /* --- Responsiveness tuning: drag should track the cursor 1:1 and
+       stop exactly where the pointer is released, no extra sliding --- */
+    constrainDuringPan: false,
+    immediateRender: true,
+    springStiffness: 10,
+    animationTime: 0.25,
+    blendTime: 0,
+    imageLoaderLimit: 4,
+
+    maxZoomPixelRatio: 4,
+    minZoomImageRatio: 0.05,
+    visibilityRatio: 0.3,
+    zoomPerScroll: 1.3,
+    gestureSettingsMouse: {
+      scrollToZoom: true,
+      clickToZoom: true,
+      dblClickToZoom: true,
+      dragToPan: true,
+      flickEnabled: false   // no inertia: panning stops exactly on release
+    },
+    gestureSettingsTouch: {
+      pinchToZoom: true,
+      dragToPan: true,
+      flickEnabled: false   // no inertia on touch either, for precise control
+    },
+    gestureSettingsPen: {
+      dragToPan: true,
+      flickEnabled: false
+    }
+  });
+
+  function showError(msg) {
+    errorBanner.textContent = msg;
+    errorBanner.style.display = 'block';
+    setTimeout(function () {
+      errorBanner.style.display = 'none';
+    }, 5000);
+  }
+
+  function showLoading(show) {
+    loadingEl.style.display = show ? 'block' : 'none';
+  }
+
+  function hideToolbar() {
+    if (!imageLoaded) return;
+    toolbar.classList.add('hidden');
+    urlInput.blur();
+  }
+
+  function showToolbar() {
+    toolbar.classList.remove('hidden');
+  }
+
+  function scheduleAutoHide() {
+    clearTimeout(toolbarHideTimer);
+    if (imageLoaded) {
+      toolbarHideTimer = setTimeout(hideToolbar, 1400);
+    }
+  }
+
+  function openImage(url) {
+    if (!url) return;
+    url = url.trim();
+    if (!url) return;
+
+    emptyState.style.display = 'none';
+    showLoading(true);
+    urlInput.value = url;
+
+    viewer.open({
+      type: 'image',
+      url: url,
+      crossOriginPolicy: 'Anonymous',
+      ajaxWithCredentials: false
+    });
+
+    var newParams = new URLSearchParams(window.location.search);
+    newParams.set('url', url);
+    var newUrl = window.location.pathname + '?' + newParams.toString();
+    window.history.replaceState({}, '', newUrl);
+  }
+
+  viewer.addHandler('open', function () {
+    showLoading(false);
+    imageLoaded = true;
+    controls.classList.add('visible');
+    scheduleAutoHide();
+  });
+
+  viewer.addHandler('open-failed', function () {
+    showLoading(false);
+    imageLoaded = false;
+    controls.classList.remove('visible');
+    emptyState.style.display = 'flex';
+    showToolbar();
+    showError('Failed to load the image. Please check the URL, or the image server may not allow cross-origin (CORS) access.');
+  });
+
+  viewer.addHandler('tile-load-failed', function () {
+    showLoading(false);
+    showError('Some tiles failed to load. This may be a network issue or CORS restriction.');
+  });
+
+  // ---- Auto-hide toolbar once an image is open; hover top edge to reveal ----
+  hoverZone.addEventListener('mouseenter', function () {
+    if (imageLoaded) {
+      showToolbar();
+      clearTimeout(toolbarHideTimer);
+    }
+  });
+  toolbar.addEventListener('mouseenter', function () {
+    clearTimeout(toolbarHideTimer);
+  });
+  toolbar.addEventListener('mouseleave', function () {
+    scheduleAutoHide();
+  });
+  hoverZone.addEventListener('touchstart', function () {
+    if (imageLoaded) {
+      showToolbar();
+      scheduleAutoHide();
+    }
+  });
+  setInterval(function () {
+    toolbarHandle.classList.toggle('show', imageLoaded && toolbar.classList.contains('hidden'));
+  }, 200);
+
+  openBtn.addEventListener('click', function () {
+    openImage(urlInput.value);
+  });
+
+  urlInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      openImage(urlInput.value);
+    }
+  });
+
+  zoomInBtn.addEventListener('click', function () {
+    viewer.viewport.zoomBy(1.4);
+    viewer.viewport.applyConstraints();
+  });
+  zoomOutBtn.addEventListener('click', function () {
+    viewer.viewport.zoomBy(0.7);
+    viewer.viewport.applyConstraints();
+  });
+  fitCtrlBtn.addEventListener('click', function () {
+    viewer.viewport.goHome(true);
+  });
+
+  var params = new URLSearchParams(window.location.search);
+  var initialUrl = params.get('url');
+  if (initialUrl) {
+    openImage(decodeURIComponent(initialUrl));
+  } else {
+    emptyState.style.display = 'flex';
+  }
+})();
+</script>
+</body>
+</html>
