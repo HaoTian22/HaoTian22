@@ -20,6 +20,7 @@
     width: 100%;
     height: 100%;
     background: #141414;
+    touch-action: none; /* let OpenSeadragon fully own pinch/pan gestures, no browser interference */
   }
 
   /* ---------- Top hover zone (reveals toolbar) ---------- */
@@ -323,8 +324,8 @@
     prefixUrl: PREFIX_URL,
     showNavigationControl: false,
 
-    /* --- Responsiveness tuning: drag should track the cursor 1:1 and
-       stop exactly where the pointer is released, no extra sliding --- */
+    /* --- Responsiveness tuning: drag/pinch should track the pointer 1:1 and
+       stop exactly where released, no extra sliding or overshoot --- */
     constrainDuringPan: false,
     immediateRender: true,
     springStiffness: 10,
@@ -341,17 +342,29 @@
       clickToZoom: true,
       dblClickToZoom: true,
       dragToPan: true,
-      flickEnabled: false   // no inertia: panning stops exactly on release
+      flickEnabled: false
     },
     gestureSettingsTouch: {
       pinchToZoom: true,
       dragToPan: true,
-      flickEnabled: false   // no inertia on touch either, for precise control
+      pinchRotate: false,
+      flickEnabled: false
     },
     gestureSettingsPen: {
       dragToPan: true,
       flickEnabled: false
     }
+  });
+
+  // ---- Make pinch-to-zoom track finger distance 1:1, with no spring "catch-up"
+  // after lifting fingers. Without this, OSD animates zoom toward the pinch's
+  // last target over `animationTime`, which reads as "it kept zooming after I let go".
+  viewer.addHandler('canvas-pinch', function (event) {
+    event.preventDefaultZoomAction = true;
+    if (!event.lastDistance) return;
+    var factor = event.distance / event.lastDistance;
+    var centerPt = viewer.viewport.pointFromPixel(event.center, true);
+    viewer.viewport.zoomBy(factor, centerPt, true); // immediately: true = no spring, exact 1:1
   });
 
   function showError(msg) {
