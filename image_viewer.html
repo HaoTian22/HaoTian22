@@ -32,7 +32,7 @@
     z-index: 999;
   }
 
-  /* ---------- Top toolbar ---------- */
+  /* ---------- Top toolbar (URL bar + Open button; auto-hides) ---------- */
   #toolbar {
     position: fixed;
     top: 0;
@@ -45,8 +45,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 14px;
-    z-index: 1000;
+    padding: 0 14px 0 62px; /* left padding reserves space for the persistent back button */
+    z-index: 998;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     transform: translateY(0);
     opacity: 1;
@@ -57,24 +57,6 @@
     opacity: 0;
     pointer-events: none;
   }
-
-  .icon-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.06);
-    color: #eee;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.18s, transform 0.12s;
-  }
-  .icon-btn:hover { background: rgba(255,255,255,0.14); }
-  .icon-btn:active { transform: scale(0.92); }
-  .icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   #urlInput {
     flex: 1;
@@ -116,6 +98,31 @@
     color: #fff;
   }
   .btn.primary:hover { background: #6690ff; }
+
+  /* ---------- Persistent back/close button (always visible, independent of toolbar) ---------- */
+  #backBtn {
+    position: fixed;
+    top: 9px;
+    left: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(24, 24, 24, 0.68);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1002; /* above toolbar so it stays put even when toolbar hides */
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transition: background 0.18s, transform 0.12s;
+  }
+  #backBtn:hover { background: rgba(255,255,255,0.16); }
+  #backBtn:active { transform: scale(0.92); }
+  #backBtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   /* ---------- Collapsed toolbar handle ---------- */
   #toolbarHandle {
@@ -251,10 +258,12 @@
 <div id="hoverZone"></div>
 <div id="toolbarHandle"></div>
 
+<!-- Persistent back/close button: always visible, never hidden by the auto-hide toolbar -->
+<button id="backBtn" title="Close tab">
+  <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+</button>
+
 <div id="toolbar">
-  <button class="icon-btn" id="closeBtn" title="Close tab">
-    <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
-  </button>
   <input id="urlInput" type="text" placeholder="Paste an image URL (jpg / png / webp...) and press Enter" />
   <button class="btn primary" id="openBtn">Open</button>
 </div>
@@ -296,7 +305,7 @@
   var loadingEl = document.getElementById('loading');
   var urlInput = document.getElementById('urlInput');
   var openBtn = document.getElementById('openBtn');
-  var closeBtn = document.getElementById('closeBtn');
+  var backBtn = document.getElementById('backBtn');
   var toolbar = document.getElementById('toolbar');
   var hoverZone = document.getElementById('hoverZone');
   var toolbarHandle = document.getElementById('toolbarHandle');
@@ -418,6 +427,7 @@
   });
 
   // ---- Auto-hide toolbar once an image is open; hover top edge to reveal ----
+  // Note: the back button is intentionally outside this toolbar and never hides.
   hoverZone.addEventListener('mouseenter', function () {
     if (imageLoaded) {
       showToolbar();
@@ -462,13 +472,12 @@
     viewer.viewport.goHome(true);
   });
 
-  // ---- Close tab button ----
-  // window.close() only works reliably on tabs opened via script (window.open)
-  // or in some browsers when it's the only tab in history. We try it, and if
-  // the browser silently blocks it, fall back to a short instruction.
-  closeBtn.addEventListener('click', function () {
+  // ---- Persistent back/close button ----
+  // window.close() only succeeds if this tab has an opener (opened via
+  // window.open() or a target="_blank" link without rel="noopener").
+  // Otherwise the browser silently blocks it, so we fall back to a message.
+  backBtn.addEventListener('click', function () {
     window.close();
-    // If we're still here after a tick, the browser blocked the close.
     setTimeout(function () {
       showError('Your browser blocked closing this tab automatically. Please close it manually (Ctrl/Cmd+W).');
     }, 300);
