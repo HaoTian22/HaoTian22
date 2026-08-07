@@ -58,6 +58,24 @@
     pointer-events: none;
   }
 
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s, transform 0.12s;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.14); }
+  .icon-btn:active { transform: scale(0.92); }
+  .icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
   #urlInput {
     flex: 1;
     min-width: 0;
@@ -234,6 +252,9 @@
 <div id="toolbarHandle"></div>
 
 <div id="toolbar">
+  <button class="icon-btn" id="closeBtn" title="Close tab">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+  </button>
   <input id="urlInput" type="text" placeholder="Paste an image URL (jpg / png / webp...) and press Enter" />
   <button class="btn primary" id="openBtn">Open</button>
 </div>
@@ -275,6 +296,7 @@
   var loadingEl = document.getElementById('loading');
   var urlInput = document.getElementById('urlInput');
   var openBtn = document.getElementById('openBtn');
+  var closeBtn = document.getElementById('closeBtn');
   var toolbar = document.getElementById('toolbar');
   var hoverZone = document.getElementById('hoverZone');
   var toolbarHandle = document.getElementById('toolbarHandle');
@@ -438,6 +460,18 @@
   });
   fitCtrlBtn.addEventListener('click', function () {
     viewer.viewport.goHome(true);
+  });
+
+  // ---- Close tab button ----
+  // window.close() only works reliably on tabs opened via script (window.open)
+  // or in some browsers when it's the only tab in history. We try it, and if
+  // the browser silently blocks it, fall back to a short instruction.
+  closeBtn.addEventListener('click', function () {
+    window.close();
+    // If we're still here after a tick, the browser blocked the close.
+    setTimeout(function () {
+      showError('Your browser blocked closing this tab automatically. Please close it manually (Ctrl/Cmd+W).');
+    }, 300);
   });
 
   var params = new URLSearchParams(window.location.search);
