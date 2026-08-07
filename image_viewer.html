@@ -318,6 +318,9 @@
 
   var imageLoaded = false;
   var toolbarHideTimer = null;
+  // If the page is opened with a ?url= param, we skip the "flash then hide"
+  // behavior and hide the toolbar immediately once the image is ready.
+  var hadInitialUrl = false;
 
   var viewer = OpenSeadragon({
     id: "viewer",
@@ -357,14 +360,13 @@
   });
 
   // ---- Make pinch-to-zoom track finger distance 1:1, with no spring "catch-up"
-  // after lifting fingers. Without this, OSD animates zoom toward the pinch's
-  // last target over `animationTime`, which reads as "it kept zooming after I let go".
+  // after lifting fingers.
   viewer.addHandler('canvas-pinch', function (event) {
     event.preventDefaultZoomAction = true;
     if (!event.lastDistance) return;
     var factor = event.distance / event.lastDistance;
     var centerPt = viewer.viewport.pointFromPixel(event.center, true);
-    viewer.viewport.zoomBy(factor, centerPt, true); // immediately: true = no spring, exact 1:1
+    viewer.viewport.zoomBy(factor, centerPt, true);
   });
 
   function showError(msg) {
@@ -422,7 +424,14 @@
     showLoading(false);
     imageLoaded = true;
     controls.classList.add('visible');
-    scheduleAutoHide();
+    if (hadInitialUrl) {
+      // Opened directly via ?url= — go straight to hidden, no visible flash.
+      clearTimeout(toolbarHideTimer);
+      hideToolbar();
+    } else {
+      // Opened manually via the input box — keep it visible briefly, then hide.
+      scheduleAutoHide();
+    }
   });
 
   viewer.addHandler('open-failed', function () {
@@ -440,7 +449,6 @@
   });
 
   // ---- Auto-hide toolbar once an image is open; hover top edge to reveal ----
-  // Note: the back button is intentionally outside this toolbar and never hides.
   hoverZone.addEventListener('mouseenter', function () {
     if (imageLoaded) {
       showToolbar();
@@ -486,9 +494,6 @@
   });
 
   // ---- Persistent back/close button ----
-  // window.close() only succeeds if this tab has an opener (opened via
-  // window.open() or a target="_blank" link without rel="noopener").
-  // Otherwise the browser silently blocks it, so we fall back to a message.
   backBtn.addEventListener('click', function () {
     window.close();
     setTimeout(function () {
@@ -499,6 +504,7 @@
   var params = new URLSearchParams(window.location.search);
   var initialUrl = params.get('url');
   if (initialUrl) {
+    hadInitialUrl = true;
     openImage(decodeURIComponent(initialUrl));
   } else {
     emptyState.style.display = 'flex';
