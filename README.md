@@ -1,31 +1,34 @@
-### Hi there 👋, I'm Hao_Tian.
-- 🏫 I am currently pursuing a Bachelor's degree in Animation and Interactive Media.
-- 🚀 I’m currently working on developing my skills in the field of media technology.
-- 📱 I have a strong interest in digital technology and its applications.
-- 🏸 In my free time, I enjoy playing badminton and going on city walks.
-- 🚊 I am also interested in public transportation and its role in sustainable urban development.
+<img src="assets/led-board.svg" alt="Decorative LED sign reading Hao_Tian" width="100%">
 
-[![GitHub stats](https://github-stats-extended.vercel.app/api?username=haotian22)](https://github.com/stats-organization/github-stats-extended)
+### <img src="assets/led/hello.svg" alt="Hello" width="100%">
 
-#### Contact me
+I'm Hao_Tian. Most of the code here started with a small question or a small annoyance in daily life.
 
-Email me in English or Chinese; you can find my email on the left.
+- Studying animation and interactive media, and writing code along the way
+- Volunteering as an OpenStreetMap mapper
+- Interested in public transit and its role in sustainable cities
+- Going on city walks
+- Playing badminton
 
-<!--
- [![Telegram](https://img.shields.io/badge/-Telegram-007acc?logo=telegram&logoColor=white&style=for-the-badge)](https://telegram.me/HaoTian22)
+### <img src="assets/led/projects.svg" alt="Projects" width="100%">
 
+**Getting around**
+- [TU-Reader](https://github.com/HaoTian22/TU-Reader): what is actually stored on your transit card?
+- [GDIC-DepartureBoard](https://github.com/HaoTian22/GDIC-DepartureBoard): an intercity departure board in HTML and JS
 
+**Maps**
+- [BNBU-Map](https://github.com/HaoTian22/BNBU-Map): my campus, mapped by the people who walk it
 
-**HaoTian22/HaoTian22** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+**Small tools**
+- [HT-Music-Downloader](https://github.com/HaoTian22/HT-Music-Downloader) · [lucky_farmer](https://github.com/HaoTian22/lucky_farmer) · [UIC-Utilities](https://github.com/HaoTian22/UIC-Utilities)
 
-Here are some ideas to get you started:
+<details>
+<summary><b>&gt;&gt;&gt; GitHub stats</b></summary>
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+[![GitHub stats](https://github-stats-extended.vercel.app/api?username=haotian22&show_icons=true&theme=transparent&hide_border=true)](https://github.com/stats-organization/github-stats-extended)
+
+</details>
+
+### <img src="assets/led/say-hi.svg" alt="Say hi" width="100%">
+
+More of my work, including animation and 3D, is at **[haotian22.top](https://haotian22.top/)**. English or 中文 both work.
