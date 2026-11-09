@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 78" width="480" height="78" role="img" aria-labelledby="t">
+<title id="t">Connect</title>
+<defs><pattern id="g" width="6" height="6" patternUnits="userSpaceOnUse"><path fill="#0a0a0b" fill-rule="evenodd" d="M0 0H6V6H0ZM0.05 3a2.95 2.95 0 1 0 5.9 0a2.95 2.95 0 1 0-5.9 0Z"/></pattern></defs>
+<rect width="480" height="78" rx="14" fill="#0a0a0b"/>
+<g transform="translate(6 6)"><rect width="468" height="66" fill="#1f1a15"/><g fill="none" stroke-width="6"><path stroke="#ffa02a" d="M24 15h18M240 15h6M18 21h6M42 21h6M240 21h6M18 27h6M60 27h18M90 27h24M126 27h24M168 27h18M204 27h18M234 27h18M18 33h6M54 33h6M78 33h6M90 33h6M114 33h6M126 33h6M150 33h6M162 33h6M186 33h6M198 33h6M240 33h6M18 39h6M54 39h6M78 39h6M90 39h6M114 39h6M126 39h6M150 39h6M162 39h30M198 39h6M240 39h6M18 45h6M42 45h6M54 45h6M78 45h6M90 45h6M114 45h6M126 45h6M150 45h6M162 45h6M198 45h6M222 45h6M240 45h6M252 45h6M24 51h18M60 51h18M90 51h6M114 51h6M126 51h6M150 51h6M168 51h18M204 51h18M246 51h6"/><path stroke="#b4ff4d" d="M390 15h18M420 15h30M384 21h6M408 21h6M438 21h6M384 27h6M402 27h12M432 27h6M384 33h6M396 33h6M408 33h6M438 33h6M384 39h12M408 39h6M444 39h6M384 45h6M408 45h6M420 45h6M444 45h6M390 51h18M426 51h18"/></g><rect width="468" height="66" fill="url(#g)"/></g>
+</svg>
