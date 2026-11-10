@@ -40,4 +40,6 @@ I'm Hao_Tian. Most of the code here started with a small question or a small ann
 
 <h3 align="center"><img src="assets/led/connect.svg" alt="Connect" width="30%"></h3>
 
-More of my work, including animation and 3D, is at **[haotian22.top](https://haotian22.top/)**. English or 中文 both work.
+More of my work, including animation and 3D, is at **[haotian22.top](https://haotian22.top/)**.
+
+Or email me at **[x8fjzzsxd@mozmail.com](mailto:x8fjzzsxd@mozmail.com)** (powered by Firefox Relay). English or 中文 both work.
